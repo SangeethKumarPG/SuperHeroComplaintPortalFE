@@ -1,0 +1,35 @@
+.hero-container{
+    background-color: #db7734;
+    background-size: 100%;
+    position: relative;
+    /* transition: border-radius 0.5s ease; */
+    width: 100vw;
+    height: 100vh;
+}
+
+/* .hero-container:hover{
+    border-radius: 2rem;
+} */
+
+
+.content {
+    text-align: center;
+    z-index: 1;
+    padding: 3rem;
+  }
+  
+  h1 {
+    font-size: 3rem;
+  }
+  
+  p {
+    font-size: 1.5rem;
+
+  }
+  
+  .animated-text {
+    font-size: 2rem;
+    color: #333;
+    margin-top: 30px;
+    z-index: 1;
+  }
