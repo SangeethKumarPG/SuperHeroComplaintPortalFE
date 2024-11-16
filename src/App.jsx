@@ -6,6 +6,8 @@ import { Route, Routes } from 'react-router-dom'
 import Home from './components/Home'
 import 'bootstrap/dist/css/bootstrap.min.css'
 import Header from './components/Header'
+import RequestHelp from './components/RequestHelp'
+
 
 function App() {
   const [count, setCount] = useState(0)
@@ -15,6 +17,7 @@ function App() {
       <Header/>
       <Routes>
         <Route path="/" element={<Home/>}/>
+        <Route path="/help" element={<RequestHelp/>}/>
       </Routes>
       
     </>
