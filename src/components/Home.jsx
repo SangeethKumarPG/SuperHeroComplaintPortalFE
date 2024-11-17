@@ -21,6 +21,14 @@ function Home() {
   const handleNavigateToHelp = () => {
     navigate("/help");
   }
+  useEffect(()=>{
+    if(window.location.hash === "#services"){
+      const servicesSection = document.getElementById("services");
+      if(servicesSection){
+        servicesSection.scrollIntoView({ behavior: "smooth" });
+      }
+    }
+  },[])
 
   const textVariants = {
     hidden: { opacity: 0 },

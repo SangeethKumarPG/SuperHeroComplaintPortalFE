@@ -4,6 +4,9 @@ import { Autocomplete, Button, Checkbox, TextField } from "@mui/material";
 import { useState, useEffect } from "react";
 import Map from "./Map";
 import CustomMap from "./CustomMap";
+import { registerComplaint } from "../services/allAPI";
+import Swal from "sweetalert2";
+
 
 function RequestHelp() {
   const [location, setLocation] = useState({ latitude: null, longitude: null });
@@ -12,6 +15,11 @@ function RequestHelp() {
     lat: null,
     lng: null,
   });
+
+  const [requesterName, setRequesterName] = useState("");
+  const [complaintType, setComplaintType] = useState("");
+  const [dangerLevel, setDangerLevel] = useState("");
+  const [description, setDescription] = useState("");
 
   useEffect(() => {
     if (navigator.geolocation) {
@@ -23,7 +31,53 @@ function RequestHelp() {
       });
     }
   }, []);
-  console.log(location);
+  console.log("Initial Location: ", location);
+  const handleSubmit = async(e)=>{
+    e.preventDefault();
+    if(requesterName !== "" && complaintType !== "" && dangerLevel !== "" && description !== ""){
+
+      const complainData = {
+        requesterName: requesterName,
+        complaintType: complaintType,
+        dangerLevel: dangerLevel,
+        description: description,
+        location: {
+          lat: customLocation ? parseFloat(customLocationData.lat) : parseFloat(location.latitude),
+          lng: customLocation ? parseFloat(customLocationData.lng) : parseFloat(location.longitude),
+        },
+      };
+      console.log("Form data: ", complainData);
+      const response = await registerComplaint(complainData);
+      if(response.status === 201){
+        Swal.fire({
+          title: 'Complaint Registered',
+          text: 'Your complaint has been registered successfully. We will get back to you soon.',
+          icon:'success'
+        }).then(() => {
+          setRequesterName("");
+          setComplaintType("");
+          setDangerLevel("");
+          setDescription("");
+          setCustomLocation(false);
+        });
+      }else{
+        Swal.fire({
+          title: 'Error',
+          text: 'Something went wrong. Please try again later.',
+          icon: 'error'
+        });
+      }
+    }else{
+      Swal.fire({
+        title: 'Error',
+        text: 'Please fill all the required fields.',
+        icon: 'error'
+      });
+    }
+  }
+
+
+
   return (
     <>
       <motion.div
@@ -33,8 +87,20 @@ function RequestHelp() {
         className="p-3"
       >
         <h1 className="text-center">Request Help</h1>
+        <TextField
+          className="mt-3"
+          variant="outlined"
+          value={requesterName}
+          fullWidth
+          label="Name of the Requester"
+          onChange={(e) => setRequesterName(e.target.value)}
+          required
+        />
         <Autocomplete
+          className="mt-3"
           freeSolo
+          value={complaintType}
+          inputValue={complaintType}
           options={[
             "Pet Missing",
             "Pet Rescue",
@@ -43,6 +109,7 @@ function RequestHelp() {
             "Rescue from Disaster",
           ]}
           // getOptionLabel={(option) => option}
+          onInputChange={(e, value) => setComplaintType(value)}
           renderInput={(params) => (
             <TextField
               variant="outlined"
@@ -50,9 +117,14 @@ function RequestHelp() {
               {...params}
             />
           )}
+          required
         />
+
         <Autocomplete
           className="mt-3"
+          freeSolo
+          value={dangerLevel}
+          inputValue={dangerLevel}
           options={[
             "Danger To Life",
             "Danger To Property",
@@ -62,6 +134,7 @@ function RequestHelp() {
             "No Immediate Response Required",
             "Potential but not immediate threat",
           ]}
+          onInputChange={(e, value) => setDangerLevel(value)}
           renderInput={(params) => (
             <TextField
               variant="outlined"
@@ -69,6 +142,7 @@ function RequestHelp() {
               {...params}
             />
           )}
+          required
         />
         <div className="mt-3">
           Custom Location
@@ -82,8 +156,8 @@ function RequestHelp() {
             <div>
               <p>Custom Location</p>
               <br />
-              <p>Latitude: {customLocationData.lat}</p>
-              <p>Longitude: {customLocationData.lng}</p>
+              {/*<p>Latitude: {customLocationData.lat}</p>
+              <p>Longitude: {customLocationData.lng}</p>*/}
               <CustomMap
                 latitude={parseFloat(location.latitude)}
                 longitude={parseFloat(location.longitude)}
@@ -103,12 +177,15 @@ function RequestHelp() {
         <TextField
           className="mt-3"
           variant="outlined"
+          value={description}
           fullWidth
           label="Issue Description"
           multiline
           rows={4}
+          onChange={(e) => setDescription(e.target.value)}
+          required
         />
-        <Button variant="contained" color="primary" fullWidth className="mt-3">Submit</Button>
+        <Button variant="contained" color="primary" fullWidth className="mt-3" onClick={handleSubmit}>Submit</Button>
 
       </motion.div>
     </>
