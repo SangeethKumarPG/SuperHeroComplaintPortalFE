@@ -31,6 +31,9 @@ function RequestHelp() {
       });
     }
   }, []);
+  useEffect(() => {
+    console.log("Custom Location Data Updated:", customLocationData);
+}, [customLocationData]);
   console.log("Initial Location: ", location);
   const handleSubmit = async(e)=>{
     e.preventDefault();
