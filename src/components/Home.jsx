@@ -143,7 +143,7 @@ function Home() {
           viewport={{ once: true, amount: 0.3 }}
           transition={{ duration: 1 }}
         >
-          Our Services
+          About us
         </motion.h2>
         {/* First Section */}
         <motion.div

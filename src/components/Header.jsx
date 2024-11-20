@@ -43,7 +43,7 @@ function Header() {
                   whileTap={{ scale: 0.95 }}
                 >
                   <Nav.Link href="/#services">
-                    Services
+                    About us
                   </Nav.Link>
                 </motion.div>
 
