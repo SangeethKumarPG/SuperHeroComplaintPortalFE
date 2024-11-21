@@ -6,7 +6,7 @@ import Map from "./Map";
 import CustomMap from "./CustomMap";
 import { registerComplaint } from "../services/allAPI";
 import Swal from "sweetalert2";
-
+import {Atom} from 'react-loading-indicators'
 
 function RequestHelp() {
   const [location, setLocation] = useState({ latitude: null, longitude: null });
@@ -20,6 +20,7 @@ function RequestHelp() {
   const [complaintType, setComplaintType] = useState("");
   const [dangerLevel, setDangerLevel] = useState("");
   const [description, setDescription] = useState("");
+  const [loading, setLoading] = useState(false);
 
   useEffect(() => {
     if (navigator.geolocation) {
@@ -33,53 +34,72 @@ function RequestHelp() {
   }, []);
   useEffect(() => {
     console.log("Custom Location Data Updated:", customLocationData);
-}, [customLocationData]);
+  }, [customLocationData]);
   console.log("Initial Location: ", location);
-  const handleSubmit = async(e)=>{
+  const handleSubmit = async (e) => {
     e.preventDefault();
-    if(requesterName !== "" && complaintType !== "" && dangerLevel !== "" && description !== ""){
-
+    if (
+      requesterName !== "" &&
+      complaintType !== "" &&
+      dangerLevel !== "" &&
+      description !== ""
+    ) {
       const complainData = {
         requesterName: requesterName,
         complaintType: complaintType,
         dangerLevel: dangerLevel,
         description: description,
         location: {
-          lat: customLocation ? parseFloat(customLocationData.lat) : parseFloat(location.latitude),
-          lng: customLocation ? parseFloat(customLocationData.lng) : parseFloat(location.longitude),
+          lat: customLocation
+            ? parseFloat(customLocationData.lat)
+            : parseFloat(location.latitude),
+          lng: customLocation
+            ? parseFloat(customLocationData.lng)
+            : parseFloat(location.longitude),
         },
       };
+
       console.log("Form data: ", complainData);
-      const response = await registerComplaint(complainData);
-      if(response.status === 201){
+
+      setLoading(true); // Show spinner
+      try {
+        const response = await registerComplaint(complainData);
+        if (response.status === 201) {
+          Swal.fire({
+            title: "Complaint Registered",
+            text: "Your complaint has been registered successfully. We will get back to you soon.",
+            icon: "success",
+          }).then(() => {
+            setRequesterName("");
+            setComplaintType("");
+            setDangerLevel("");
+            setDescription("");
+            setCustomLocation(false);
+          });
+        } else {
+          Swal.fire({
+            title: "Error",
+            text: "Something went wrong. Please try again later.",
+            icon: "error",
+          });
+        }
+      } catch (error) {
         Swal.fire({
-          title: 'Complaint Registered',
-          text: 'Your complaint has been registered successfully. We will get back to you soon.',
-          icon:'success'
-        }).then(() => {
-          setRequesterName("");
-          setComplaintType("");
-          setDangerLevel("");
-          setDescription("");
-          setCustomLocation(false);
+          title: "Error",
+          text: "An error occurred during submission.",
+          icon: "error",
         });
-      }else{
-        Swal.fire({
-          title: 'Error',
-          text: 'Something went wrong. Please try again later.',
-          icon: 'error'
-        });
+      } finally {
+        setLoading(false); // Hide spinner
       }
-    }else{
+    } else {
       Swal.fire({
-        title: 'Error',
-        text: 'Please fill all the required fields.',
-        icon: 'error'
+        title: "Error",
+        text: "Please fill all the required fields.",
+        icon: "error",
       });
     }
-  }
-
-
+  };
 
   return (
     <>
@@ -188,8 +208,21 @@ function RequestHelp() {
           onChange={(e) => setDescription(e.target.value)}
           required
         />
-        <Button variant="contained" color="primary" fullWidth className="mt-3" onClick={handleSubmit}>Submit</Button>
-
+        {loading ? (
+          <div className="mt-3 d-flex justify-content-center">
+            <Atom size={50} color="#db7734" />
+          </div>
+        ) : (
+          <Button
+            variant="contained"
+            color="primary"
+            fullWidth
+            className="mt-3"
+            onClick={handleSubmit}
+          >
+            Submit
+          </Button>
+        )}
       </motion.div>
     </>
   );
