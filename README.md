@@ -12,3 +12,4 @@ You can access the portal by navigating to `http://localhost:5173` in your brows
 
 NOTE :
 - To change the url of the server, you can modify the baseURL in src/services/baseURL.js file.
+- Kindly enable the location permission for the browser to access the location of the user.
